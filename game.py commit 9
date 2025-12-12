@@ -1,0 +1,6 @@
+self.high_score = 0
+font = pygame.font.SysFont(None, 30)
+self.window.blit(font.render(f"Lives: {self.lives}", True, (255,255,255)), (10,10))
+self.window.blit(font.render(f"Score: {self.score}", True, (255,255,255)), (10,40))
+self.window.blit(font.render(f"Wave: {self.wave}", True, (255,255,255)), (10,70))
+self.window.blit(font.render(f"High Score: {self.high_score}", True, (255,255,255)), (10,100))
