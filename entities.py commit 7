@@ -68,7 +68,7 @@ class Enemy:
         pygame.draw.rect(window, self.color, (self.x, self.y, self.width, self.height))
 
 
-# ------------------------ SPECIAL ENEMIES ------------------------
+#SPECIAL ENEMIES
 
 class TankEnemy(Enemy):
     def __init__(self, x, y):
