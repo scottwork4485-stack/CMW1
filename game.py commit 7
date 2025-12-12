@@ -1,0 +1,144 @@
+import pygame
+import random
+from entities import Player, Bullet, Enemy, TankEnemy, DoubleShotEnemy, RapidFireEnemy, Barrier
+
+class Game:
+    def __init__(self, window, width, height):
+        self.window = window
+        self.width = width
+        self.height = height
+
+        self.player = Player(width // 2, height - 60)
+        self.bullets = []
+        self.enemy_bullets = []
+        self.enemies = []
+
+        # WAVE SYSTEM
+        self.wave = 1
+        self.enemy_speed = 1
+        self.enemy_direction = 1
+
+        self.score = 0
+        self.lives = 3
+        self.player_respawn_time = 0
+
+        self.barriers = []
+        self.create_enemy_grid()
+        self.create_barriers()
+
+    def create_enemy_grid(self):
+        self.enemies = []
+        rows = 5
+        cols = 10
+        x_offset = 55
+        y_offset = 40
+
+        for row in range(rows):
+            for col in range(cols):
+                x = x_offset + col * 60
+                y = y_offset + row * 50
+
+                roll = random.random()
+                special_chance = min(0.05 + self.wave * 0.02, 0.3)
+
+                if roll < special_chance / 3:
+                    self.enemies.append(TankEnemy(x, y))
+                elif roll < special_chance * 2 / 3:
+                    self.enemies.append(DoubleShotEnemy(x, y))
+                elif roll < special_chance:
+                    self.enemies.append(RapidFireEnemy(x, y))
+                else:
+                    self.enemies.append(Enemy(x, y))
+
+    def create_barriers(self):
+        gap = self.width // 5
+        y = self.height - 150
+        for i in range(4):
+            self.barriers.append(Barrier(gap * (i + 1) - 30, y))
+
+    def update(self):
+        keys = pygame.key.get_pressed()
+        self.player.update(keys, self.bullets)
+
+        # ---------------- PLAYER BULLETS ----------------
+        for bullet in self.bullets[:]:
+            bullet.update()
+            rect = pygame.Rect(bullet.x - bullet.radius, bullet.y - bullet.radius, bullet.radius*2, bullet.radius*2)
+
+            for enemy in self.enemies[:]:
+                if rect.colliderect(enemy.get_rect()):
+                    if enemy.take_damage():
+                        self.enemies.remove(enemy)
+                        self.score += 100
+                    if bullet in self.bullets:
+                        self.bullets.remove(bullet)
+                    break
+
+        self.bullets = [b for b in self.bullets if b.y > 0]
+
+        # ---------------- ENEMY MOVEMENT ----------------
+        move_down = False
+        for enemy in self.enemies:
+            enemy.x += self.enemy_direction * self.enemy_speed
+            if enemy.x <= 0 or enemy.x + enemy.width >= self.width:
+                move_down = True
+
+        if move_down:
+            self.enemy_direction *= -1
+            for enemy in self.enemies:
+                enemy.y += 5
+
+        # ---------------- ENEMY SHOOTING ----------------
+        if len(self.enemies) > 0:
+            shooter = random.choice(self.enemies)
+
+            if random.random() < 0.02:
+                if isinstance(shooter, DoubleShotEnemy):
+                    for (bx, by) in shooter.shoot():
+                        self.enemy_bullets.append(Bullet(bx, by, +1))
+                else:
+                    x = shooter.x + shooter.width // 2
+                    y = shooter.y + shooter.height
+                    self.enemy_bullets.append(Bullet(x, y, +1))
+
+        # ---------------- ENEMY BULLETS ----------------
+        for bullet in self.enemy_bullets[:]:
+            bullet.update()
+
+            rect = pygame.Rect(bullet.x - bullet.radius, bullet.y - bullet.radius, bullet.radius*2, bullet.radius*2)
+
+            if self.player_respawn_time == 0 and rect.colliderect(self.player.get_rect()):
+                self.enemy_bullets.remove(bullet)
+                self.lives -= 1
+                self.player_respawn_time = 120
+                continue
+
+        self.enemy_bullets = [b for b in self.enemy_bullets if b.y < self.height]
+
+        if self.player_respawn_time > 0:
+            self.player_respawn_time -= 1
+
+        # ------ WAVE CLEARED ------
+        if len(self.enemies) == 0:
+            self.wave += 1
+            self.enemy_speed = 1 + (self.wave * 0.2)
+            self.enemy_direction = 1
+            self.create_enemy_grid()
+
+    def draw(self):
+        self.window.fill((0, 0, 0))
+
+        font = pygame.font.SysFont(None, 30)
+        self.window.blit(font.render(f"Score: {self.score}", True, (255, 255, 255)), (10, 40))
+        self.window.blit(font.render(f"Lives: {self.lives}", True, (255, 255, 255)), (10, 10))
+
+        for barrier in self.barriers:
+            barrier.draw(self.window)
+
+        self.player.draw(self.window)
+        for enemy in self.enemies:
+            enemy.draw(self.window)
+        for bullet in self.bullets:
+            bullet.draw(self.window)
+        for bullet in self.enemy_bullets:
+            bullet.draw(self.window)
