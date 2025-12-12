@@ -1,0 +1,36 @@
+
+        # ---------------- ENEMY SHOOTING ----------------
+        if len(self.enemies) > 0:         # <-- FIX: prevents crash
+            shooter = random.choice(self.enemies)
+
+            fire_chance = 0.02 + (self.wave * 0.01)
+
+            if random.random() < fire_chance:
+
+                # Double shot enemy
+                if isinstance(shooter, DoubleShotEnemy):
+                    for (bx, by) in shooter.shoot():
+                        self.enemy_bullets.append(Bullet(bx, by, +1))
+
+                # Rapid fire enemy
+                elif isinstance(shooter, RapidFireEnemy):
+                    bx = shooter.x + shooter.width // 2
+                    by = shooter.y + shooter.height
+                    self.enemy_bullets.append(Bullet(bx, by, +1))
+                    if random.random() < 0.4:
+                        self.enemy_bullets.append(Bullet(bx, by, +1))
+
+                # Normal shot
+                else:
+                    bx = shooter.x + shooter.width // 2
+                    by = shooter.y + shooter.height
+                    self.enemy_bullets.append(Bullet(bx, by, +1))
+
+        # ------ WAVE CLEARED ------
+        if len(self.enemies) == 0:
+            self.wave += 1
+            self.score += 500
+            self.enemy_direction = 1
+            self.enemy_speed = 1 + (self.wave * 0.2)
+            self.create_enemy_grid()
+            return
