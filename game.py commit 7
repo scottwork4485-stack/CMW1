@@ -60,7 +60,7 @@ class Game:
         keys = pygame.key.get_pressed()
         self.player.update(keys, self.bullets)
 
-        # ---------------- PLAYER BULLETS ----------------
+        #PLAYER BULLETS
         for bullet in self.bullets[:]:
             bullet.update()
             rect = pygame.Rect(bullet.x - bullet.radius, bullet.y - bullet.radius, bullet.radius*2, bullet.radius*2)
@@ -76,7 +76,7 @@ class Game:
 
         self.bullets = [b for b in self.bullets if b.y > 0]
 
-        # ---------------- ENEMY MOVEMENT ----------------
+        #ENEMY MOVEMENT
         move_down = False
         for enemy in self.enemies:
             enemy.x += self.enemy_direction * self.enemy_speed
@@ -88,7 +88,7 @@ class Game:
             for enemy in self.enemies:
                 enemy.y += 5
 
-        # ---------------- ENEMY SHOOTING ----------------
+        #ENEMY SHOOTING
         if len(self.enemies) > 0:
             shooter = random.choice(self.enemies)
 
@@ -101,7 +101,7 @@ class Game:
                     y = shooter.y + shooter.height
                     self.enemy_bullets.append(Bullet(x, y, +1))
 
-        # ---------------- ENEMY BULLETS ----------------
+        #ENEMY BULLETS
         for bullet in self.enemy_bullets[:]:
             bullet.update()
 
@@ -118,7 +118,7 @@ class Game:
         if self.player_respawn_time > 0:
             self.player_respawn_time -= 1
 
-        # ------ WAVE CLEARED ------
+        #WAVE CLEARED
         if len(self.enemies) == 0:
             self.wave += 1
             self.enemy_speed = 1 + (self.wave * 0.2)
