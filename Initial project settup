@@ -1,0 +1,41 @@
+import pygame
+
+from game import Game
+
+pygame.init()
+
+# screen size
+
+WIDTH = 800
+
+HEIGHT = 600 
+
+WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+
+pygame.display.set_caption("Space Invaders")
+
+FPS = 60
+
+clock = pygame.time.Clock()
+
+#core of the game, what the other folders build off
+def main():
+    game = Game(WINDOW, WIDTH, HEIGHT)
+
+    running = True
+    while running:
+            clock.tick(FPS)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+            game.update()
+            game.draw()
+
+            pygame.display.update()
+
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
