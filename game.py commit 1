@@ -1,0 +1,11 @@
+class Game:
+    def __init__(self, window, width, height):
+        self.window = window
+        self.width = width
+        self.height = height
+
+    def update(self):
+        pass
+
+    def draw(self):
+        self.window.fill((0, 0, 0))
