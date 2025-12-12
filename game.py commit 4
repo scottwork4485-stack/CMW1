@@ -1,0 +1,78 @@
+import pygame
+from entities import Player, Bullet, Enemy
+
+class Game:
+    def __init__(self, window, width, height):
+        self.window = window
+        self.width = width
+        self.height = height
+
+        self.player = Player(width // 2, height - 60)
+        self.bullets = []
+        self.enemies = []
+
+        self.enemy_direction = 1
+        self.enemy_speed = 1
+        self.score = 0
+
+        self.create_enemy_grid()
+
+    def create_enemy_grid(self):
+        rows = 5
+        cols = 10
+        x_offset = 55
+        y_offset = 40
+
+        for row in range(rows):
+            for col in range(cols):
+                x = x_offset + col * 60
+                y = y_offset + row * 50
+                self.enemies.append(Enemy(x, y))
+
+    def update(self):
+        keys = pygame.key.get_pressed()
+        self.player.update(keys, self.bullets)
+
+        for bullet in self.bullets[:]:
+            bullet.update()
+
+            bullet_rect = pygame.Rect(
+                bullet.x - bullet.radius, bullet.y - bullet.radius,
+                bullet.radius * 2, bullet.radius * 2
+            )
+
+            # Bullet hits enemy
+            for enemy in self.enemies[:]:
+                if bullet_rect.colliderect(enemy.get_rect()):
+                    self.enemies.remove(enemy)
+                    self.score += 100
+                    if bullet in self.bullets:
+                        self.bullets.remove(bullet)
+                    break
+
+        # Move enemies
+        move_down = False
+        for enemy in self.enemies:
+            enemy.x += self.enemy_direction * self.enemy_speed
+            if enemy.x <= 0 or enemy.x + enemy.width >= self.width:
+                move_down = True
+
+        if move_down:
+            self.enemy_direction *= -1
+            for enemy in self.enemies:
+                enemy.y += 5
+
+    def draw(self):
+        self.window.fill((0, 0, 0))
+
+        font = pygame.font.SysFont(None, 30)
+        score_text = font.render(f"Score: {self.score}", True, (255, 255, 255))
+        self.window.blit(score_text, (10, 10))
+
+        self.player.draw(self.window)
+
+        for enemy in self.enemies:
+            enemy.draw(self.window)
+
+        for bullet in self.bullets:
+            bullet.draw(self.window)
