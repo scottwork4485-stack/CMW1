@@ -3,7 +3,7 @@ import pygame
 PLAYER_SPEED = 5
 BULLET_SPEED = 7
 
-# Player, Bullet, Enemy (same as earlier)
+# Player, Bullet, Enemy
 
 class Barrier:
     def __init__(self, x, y):
