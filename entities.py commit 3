@@ -3,8 +3,6 @@ import pygame
 PLAYER_SPEED = 5
 BULLET_SPEED = 7
 
-# Player + Bullet classes remain unchanged from Commit 2 above.
-
 class Enemy:
     def __init__(self, x, y):
         self.x = x
