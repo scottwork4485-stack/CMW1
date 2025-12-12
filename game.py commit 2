@@ -1,0 +1,23 @@
+import pygame
+from entities import Player, Bullet
+
+class Game:
+    def __init__(self, window, width, height):
+        self.window = window
+        self.width = width
+        self.height = height
+
+        self.player = Player(width // 2, height - 60)
+        self.bullets = []
+
+    def update(self):
+        keys = pygame.key.get_pressed()
+        self.player.update(keys, self.bullets)
+        for bullet in self.bullets:
+            bullet.update()
+
+    def draw(self):
+        self.window.fill((0, 0, 0))
+        self.player.draw(self.window)
+        for bullet in self.bullets:
+            bullet.draw(self.window)
