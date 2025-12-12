@@ -1,0 +1,20 @@
+import pygame
+
+PLAYER_SPEED = 5
+BULLET_SPEED = 7
+
+# Player + Bullet classes remain unchanged from Commit 2 above.
+
+class Enemy:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.width = 35
+        self.height = 25
+        self.color = (255, 0, 0)
+
+    def get_rect(self):
+        return pygame.Rect(self.x, self.y, self.width, self.height)
+
+    def draw(self, window):
+        pygame.draw.rect(window, self.color, (self.x, self.y, self.width, self.height))
